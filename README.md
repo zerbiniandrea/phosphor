@@ -1,22 +1,16 @@
-<div align="center">
-
-<img src="public/favicon.svg" width="88" alt="phosphor CRT icon" />
-
 ```
-█████ █   █ █████ █████ █████ █   █ █████ █████
-█   █ █   █ █   █ █     █   █ █   █ █   █ █   █
-█████ █████ █   █ █████ █████ █████ █   █ █████
-█     █   █ █   █     █ █     █   █ █   █ █ █
-█     █   █ █████ █████ █     █   █ █████ █   █
+    █████ █   █ █████ █████ █████ █   █ █████ █████
+    █   █ █   █ █   █ █     █   █ █   █ █   █ █   █
+    █████ █████ █   █ █████ █████ █████ █   █ █████
+    █     █   █ █   █     █ █     █   █ █   █ █ █
+    █     █   █ █████ █████ █     █   █ █████ █   █
 
-      ─── a frame-rate perception test ───
+              ─── a frame-rate perception test ───
 ```
 
-<br />
-
-<img src="docs/oscilloscope.png" width="820" alt="phosphor oscilloscope round — a Lissajous trail glows on a green CRT, prompting 'AT WHAT FPS IS THIS RENDERING'" />
-
-</div>
+<p align="center">
+  <img src="docs/oscilloscope.png" width="820" alt="phosphor oscilloscope round — a Lissajous trail glows on a green CRT, prompting 'AT WHAT FPS IS THIS RENDERING'" />
+</p>
 
 ```
 $ man phosphor
@@ -31,20 +25,11 @@ SYNOPSIS
 
 ## ▌ TRANSMISSION
 
-The tube hums. Something flickers on screen.
-You watch. You guess. The CRT judges you.
+A clip plays at a hidden frame rate. You guess the rate.
+The CRT scores the gap.
 
 There is no leaderboard. The CRT remembers your last fifty runs
 and that is enough.
-
-## ▌ POWER ON
-
-```
-$ pnpm install
-$ pnpm dev
-```
-
-Open the URL Vite prints. Dim the lights. Let your eyes adjust.
 
 ## ▌ CONTROLS
 

@@ -1,0 +1,202 @@
+:root {
+    --bg: #0a0f08;
+    --bg-deep: #050805;
+    --phosphor: #33ff66;
+    --phosphor-dim: #1a9938;
+    --phosphor-faint: #0d4a1c;
+    --phosphor-bright: #b6ffc8;
+    --amber: #ffb000;
+    --danger: #ff5544;
+
+    --glow-sm: 0 0 2px var(--phosphor), 0 0 4px var(--phosphor-dim);
+    --glow-md:
+        0 0 4px var(--phosphor), 0 0 10px var(--phosphor-dim),
+        0 0 20px var(--phosphor-faint);
+    --glow-lg:
+        0 0 6px var(--phosphor), 0 0 16px var(--phosphor), 0 0 30px var(--phosphor-dim),
+        0 0 60px var(--phosphor-faint);
+
+    --font-crt: "VT323", "IBM Plex Mono", "Courier New", monospace;
+
+    color-scheme: dark;
+    font-family: var(--font-crt);
+    font-weight: 400;
+    color: var(--phosphor);
+    background: var(--bg-deep);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+    /* Dark room with: fine-grain SVG noise (wall texture), phosphor light
+       spill from behind the monitor, faint warm overhead, dark base. */
+    background:
+        url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.12  0 0 0 0 0.14  0 0 0 0 0.1  0 0 0 0.55 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>"),
+        radial-gradient(
+            ellipse 80% 55% at 50% 65%,
+            rgba(51, 255, 102, 0.09) 0%,
+            rgba(51, 255, 102, 0.04) 35%,
+            transparent 70%
+        ),
+        radial-gradient(
+            ellipse at 50% -10%,
+            rgba(255, 240, 210, 0.05) 0%,
+            transparent 50%
+        ),
+        linear-gradient(to bottom, #181a13 0%, #0c0e09 55%, #050604 100%);
+}
+
+#app {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+h1,
+h2,
+h3,
+p,
+ul,
+li {
+    margin: 0;
+    padding: 0;
+}
+
+ul {
+    list-style: none;
+}
+
+button {
+    font: inherit;
+    color: inherit;
+    background: transparent;
+    border: 1px solid var(--phosphor-dim);
+    padding: 0.4em 1em;
+    cursor: pointer;
+    text-shadow: var(--glow-sm);
+    letter-spacing: 0.05em;
+    transition:
+        background 0.12s,
+        border-color 0.12s,
+        text-shadow 0.12s;
+}
+
+button:hover,
+button:focus-visible {
+    background: var(--phosphor-faint);
+    border-color: var(--phosphor);
+    text-shadow: var(--glow-md);
+    outline: none;
+}
+
+input {
+    font: inherit;
+    color: var(--phosphor-bright);
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--phosphor-dim);
+    padding: 0.2em 0;
+    text-shadow: var(--glow-sm);
+    caret-color: var(--phosphor);
+    outline: none;
+}
+
+input:focus {
+    border-bottom-color: var(--phosphor);
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+::selection {
+    background: var(--phosphor);
+    color: var(--bg-deep);
+}
+
+.glow {
+    text-shadow: var(--glow-md);
+}
+
+.glow-lg {
+    text-shadow: var(--glow-lg);
+}
+
+.dim {
+    color: var(--phosphor-dim);
+}
+
+.bright {
+    color: var(--phosphor-bright);
+    text-shadow: var(--glow-lg);
+}
+
+.cursor {
+    display: inline-block;
+    width: 0.55em;
+    height: 1em;
+    vertical-align: text-bottom;
+    background: var(--phosphor);
+    box-shadow: var(--glow-md);
+    animation: blink 1s steps(2, end) infinite;
+}
+
+@keyframes blink {
+    50% {
+        opacity: 0;
+    }
+}
+
+@keyframes flicker {
+    0%,
+    100% {
+        opacity: 1;
+    }
+    4% {
+        opacity: 0.96;
+    }
+    6% {
+        opacity: 1;
+    }
+    44% {
+        opacity: 1;
+    }
+    46% {
+        opacity: 0.98;
+    }
+    48% {
+        opacity: 1;
+    }
+}
+
+@keyframes vshift {
+    0%,
+    98%,
+    100% {
+        transform: translateY(0);
+    }
+    99% {
+        transform: translateY(-2px);
+    }
+}

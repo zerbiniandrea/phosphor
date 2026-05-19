@@ -83,7 +83,7 @@
 
         <div class="brand">
             <span class="brand-mark">PHOSPHOR</span>
-            <span class="brand-sub">P-1 · {game.monitorHz || "—"}Hz</span>
+            <span class="brand-sub">REV · {__COMMIT_SHA__}</span>
         </div>
 
         <div class="knobs">

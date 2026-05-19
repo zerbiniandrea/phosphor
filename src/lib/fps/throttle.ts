@@ -32,10 +32,15 @@ export function pickRandomFps(
 }
 
 /**
- * Pick FPS values with a difficulty-specific spacing strategy:
- * - easy: spread across the full divisor range (big gaps between consecutive values)
- * - normal: uniformly random
- * - hard: tight cluster of consecutive divisors (small gaps, hard to discriminate)
+ * Pick FPS values with a difficulty-specific spacing strategy.
+ * Sampling is uniform in FPS space (not divisor space), so values spread
+ * across the monitor's FPS range instead of crowding into the low end
+ * where the divisor pool is dense (e.g. at 240Hz, divisors 2..20 give 19
+ * FPS values but 14 of them sit below 25 fps).
+ *
+ * - easy: evenly spaced across the FPS range (max spread)
+ * - normal: stratified random — one value per FPS bin
+ * - hard: tight cluster around a randomly-placed FPS center
  */
 export function pickFpsForDifficulty(
     monitorHz: number,
@@ -45,44 +50,102 @@ export function pickFpsForDifficulty(
 ): number[] {
     const { minFps = 10 } = opts
     const maxDivisor = Math.floor(monitorHz / minFps)
-    const divisors: number[] = []
-    for (let d = 2; d <= maxDivisor; d++) divisors.push(d)
-    if (divisors.length === 0) return []
+    // Achievable FPS pool sorted ascending. Includes d=1 (native refresh)
+    // so high-refresh monitors can test discrimination at their top end.
+    const pool: number[] = []
+    for (let d = 1; d <= maxDivisor; d++) pool.push(monitorHz / d)
+    pool.sort((a, b) => a - b)
+    if (pool.length === 0) return []
+    if (pool.length <= count) {
+        const out = [...pool]
+        shuffle(out)
+        return out
+    }
 
-    const toFps = (ds: number[]) => ds.map(d => monitorHz / d)
+    const fpsMin = pool[0]
+    const fpsMax = pool[pool.length - 1]
+    const range = fpsMax - fpsMin
 
     if (difficulty === "easy") {
-        if (divisors.length <= count) {
-            const out = [...divisors]
-            shuffle(out)
-            return toFps(out)
-        }
-        // Evenly spaced indices across the divisor list.
-        const picked: number[] = []
-        const step = (divisors.length - 1) / (count - 1)
+        // Evenly spaced FPS targets across [fpsMin, fpsMax], snapped to
+        // the nearest unused pool value.
+        const used = new Set<number>()
+        const out: number[] = []
         for (let i = 0; i < count; i++) {
-            picked.push(divisors[Math.round(i * step)])
+            const target = fpsMin + range * (i / (count - 1))
+            const v = nearestUnused(target, pool, used)
+            if (v !== null) {
+                used.add(v)
+                out.push(v)
+            }
         }
-        shuffle(picked)
-        return toFps(picked)
+        shuffle(out)
+        return out
     }
 
     if (difficulty === "hard") {
-        if (divisors.length <= count) {
-            const out = [...divisors]
-            shuffle(out)
-            return toFps(out)
-        }
-        // Pick a random window of `count` consecutive divisors.
-        const start = Math.floor(Math.random() * (divisors.length - count + 1))
-        const picked = divisors.slice(start, start + count)
+        // Random center uniformly placed across the FPS range, then take
+        // the `count` pool values closest to it in FPS. The center
+        // distribution is uniform in FPS rather than divisor index, so
+        // clusters land at high, mid, and low FPS in proportion to the
+        // FPS range each region covers.
+        const center = fpsMin + Math.random() * range
+        const byDist = [...pool].sort(
+            (a, b) => Math.abs(a - center) - Math.abs(b - center),
+        )
+        const picked = byDist.slice(0, count)
         shuffle(picked)
-        return toFps(picked)
+        return picked
     }
 
-    // normal — uniformly random.
-    shuffle(divisors)
-    return toFps(divisors.slice(0, count))
+    // normal — stratified across `count` equal-width FPS bins, one value
+    // per bin; empty bins are filled from remaining unused pool entries.
+    const used = new Set<number>()
+    const out: number[] = []
+    for (let i = 0; i < count; i++) {
+        const lo = fpsMin + range * (i / count)
+        const hi = fpsMin + range * ((i + 1) / count)
+        const candidates: number[] = []
+        for (const v of pool) {
+            if (used.has(v)) continue
+            if (v >= lo && (v < hi || (i === count - 1 && v <= hi))) {
+                candidates.push(v)
+            }
+        }
+        if (candidates.length > 0) {
+            const v = candidates[Math.floor(Math.random() * candidates.length)]
+            used.add(v)
+            out.push(v)
+        }
+    }
+    while (out.length < count) {
+        const remaining: number[] = []
+        for (const v of pool) if (!used.has(v)) remaining.push(v)
+        if (remaining.length === 0) break
+        const v = remaining[Math.floor(Math.random() * remaining.length)]
+        used.add(v)
+        out.push(v)
+    }
+    shuffle(out)
+    return out
+}
+
+function nearestUnused(
+    target: number,
+    sorted: number[],
+    used: Set<number>,
+): number | null {
+    let best: number | null = null
+    let bestDist = Infinity
+    for (const v of sorted) {
+        if (used.has(v)) continue
+        const d = Math.abs(v - target)
+        if (d < bestDist) {
+            best = v
+            bestDist = d
+        }
+    }
+    return best
 }
 
 function shuffle<T>(arr: T[]): void {

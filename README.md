@@ -1,23 +1,35 @@
-<p align="center">
-  <img src="public/favicon.svg" width="96" alt="phosphor CRT icon" />
-</p>
+<div align="center">
+
+<img src="public/favicon.svg" width="88" alt="phosphor CRT icon" />
 
 ```
-    █████ █   █ █████ █████ █████ █   █ █████ █████
-    █   █ █   █ █   █ █     █   █ █   █ █   █ █   █
-    █████ █████ █   █ █████ █████ █████ █   █ █████
-    █     █   █ █   █     █ █     █   █ █   █ █ █
-    █     █   █ █████ █████ █     █   █ █████ █   █
+█████ █   █ █████ █████ █████ █   █ █████ █████
+█   █ █   █ █   █ █     █   █ █   █ █   █ █   █
+█████ █████ █   █ █████ █████ █████ █   █ █████
+█     █   █ █   █     █ █     █   █ █   █ █ █
+█     █   █ █████ █████ █     █   █ █████ █   █
 
-              ─── a frame-rate perception test ───
+      ─── a frame-rate perception test ───
 ```
 
-> a small green-phosphor CRT, a dim room, and one question:
-> _how many frames per second was that?_
+<br />
 
----
+<img src="docs/oscilloscope.png" width="820" alt="phosphor oscilloscope round — a Lissajous trail glows on a green CRT, prompting 'AT WHAT FPS IS THIS RENDERING'" />
 
-## ░ TRANSMISSION ░
+</div>
+
+```
+$ man phosphor
+
+NAME
+       phosphor(1) — a frame-rate perception test
+
+SYNOPSIS
+       a small green-phosphor CRT, a dim room, and one question:
+       how many frames per second was that?
+```
+
+## ▌ TRANSMISSION
 
 The tube hums. Something flickers on screen.
 You watch. You guess. The CRT judges you.
@@ -25,7 +37,7 @@ You watch. You guess. The CRT judges you.
 There is no leaderboard. The CRT remembers your last fifty runs
 and that is enough.
 
-## ░ POWER ON ░
+## ▌ POWER ON
 
 ```
 $ pnpm install
@@ -34,51 +46,55 @@ $ pnpm dev
 
 Open the URL Vite prints. Dim the lights. Let your eyes adjust.
 
-## ░ CONTROLS ░
+## ▌ CONTROLS
 
 ```
-  [↑ ↓]   navigate
-  [↵]     select
-  [ESC]   back
-  [M]     mute the hum
-  [S]     (on results) copy a share card
+┌─────────────────────────────────────────────┐
+│   ↑ ↓     navigate                          │
+│   ↵       select                            │
+│   ESC     back                              │
+│   M       mute the hum                      │
+│   S       (results) copy a share card       │
+└─────────────────────────────────────────────┘
 ```
 
-## ░ CALIBRATION ░
+## ▌ CALIBRATION
 
-First boot, the menu will nag you.
-Calibration is one screen — it measures your monitor's refresh
-ceiling and remembers it. The game uses that ceiling as the
-upper bound on what it'll throw at you.
+First boot, the menu will nag you. Calibration is one screen —
+it measures your monitor's refresh ceiling and remembers it.
+The game uses that ceiling as the upper bound on what it'll
+throw at you.
 
 Different display? Calibrate again.
 
-## ░ DIFFICULTY ░
+## ▌ DIFFICULTY
 
 ```
-  EASY     5 rounds   ·  gentler curve
-  NORMAL  10 rounds   ·
-  HARD    15 rounds   ·  meaner curve
+┌─────────────────────────────────────────────┐
+│   EASY      5 rounds    ·  gentler curve    │
+│   NORMAL   10 rounds    ·                   │
+│   HARD     15 rounds    ·  meaner curve     │
+└─────────────────────────────────────────────┘
 ```
 
 Per-difficulty bests live in `MENU → HISTORY`.
 
-## ░ SHARE CARD ░
-
-```
-  PHOSPHOR · HARD · 87.3/100
-  144 Hz native
-
-  🟢🟢🟡🟢🟢🟡🟡🟢🟢🟢🟢🟢🟡🟢🟢
-
-  #   ACTUAL  GUESS  SCORE
-  01    48.0   45.0   91.2
-  ...
-```
+## ▌ SHARE CARD
 
 Press `S` on the results screen — it goes straight to your clipboard.
 
-## ░ INTERNALS ░
+```
+PHOSPHOR · HARD · 87.3/100
+144 Hz native
+
+🟢🟢🟡🟢🟢🟡🟡🟢🟢🟢🟢🟢🟡🟢🟢
+
+ #   ACTUAL  GUESS  SCORE
+01     48.0   45.0   91.2
+ …
+```
+
+## ▌ INTERNALS
 
 Svelte 5 (runes) · TypeScript · Vite · pnpm.
 No router, no backend, no accounts. Whatever needs to be
@@ -90,15 +106,16 @@ $ pnpm build       ── bundle
 $ pnpm checklist   ── lint, format, typecheck
 ```
 
-## ░ ON THE AESTHETIC ░
+## ▌ AESTHETIC
 
-The CRT is real-ish on purpose. A slightly recessed tube. A
-plastic gasket ring. A phosphor halo bleeding onto the wall
-behind it. A degauss wobble whenever a screen changes. A hum
-bar that occasionally sweeps the menu.
+The CRT is real-ish on purpose. A slightly recessed tube.
+A plastic gasket ring. A phosphor halo bleeding onto the
+wall behind it. A degauss wobble whenever a screen changes.
+A hum bar that occasionally sweeps the menu.
 
 None of it is necessary. All of it is the point.
 
 ```
-                                              ▒▓ END OF FILE ▓▒
+$ exit
+─── end of transmission ───
 ```

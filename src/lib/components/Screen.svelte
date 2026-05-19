@@ -30,6 +30,29 @@
         cycleVolume()
         sfx.tick()
     }
+
+    // Occasional CRT glitch burst (noise + sweeping hum bar + content jitter)
+    // — runs only while the menu is active. Lives at the Screen layer so
+    // the overlay covers the entire CRT interior, not just the menu box.
+    let glitching = $state(false)
+    let glitchTimer = 0
+
+    function scheduleGlitch(delay: number) {
+        glitchTimer = window.setTimeout(() => {
+            glitching = true
+            window.setTimeout(() => {
+                glitching = false
+                scheduleGlitch(8000 + Math.random() * 7000)
+            }, 900)
+        }, delay)
+    }
+
+    $effect(() => {
+        window.clearTimeout(glitchTimer)
+        glitching = false
+        if (game.screen === "menu") scheduleGlitch(2000)
+        return () => window.clearTimeout(glitchTimer)
+    })
 </script>
 
 <div
@@ -38,10 +61,12 @@
     style:--crt-contrast={contrastFilter}
 >
     <div class="screen">
-        <div class="curvature">
+        <div class="curvature" class:glitching>
             <div class="content">
                 {@render children()}
             </div>
+            <div class="glitch-noise" aria-hidden="true"></div>
+            <div class="glitch-band" aria-hidden="true"></div>
             <div class="scanlines" aria-hidden="true"></div>
             <div class="vignette" aria-hidden="true"></div>
             <div class="glare" aria-hidden="true"></div>
@@ -265,6 +290,118 @@
         display: flex;
         flex-direction: column;
         overflow: hidden;
+    }
+
+    /* Glitch overlays — sit between content and the screen-effect overlays
+       so scanlines/vignette/glass still apply on top. */
+    .glitch-noise,
+    .glitch-band {
+        pointer-events: none;
+        position: absolute;
+        inset: 0;
+        z-index: 9;
+        opacity: 0;
+    }
+
+    .glitch-noise {
+        background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='320' height='320'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='1.6' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.7  0 0 0 0 1  0 0 0 0 0.78  0 0 0 0.9 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+        mix-blend-mode: screen;
+    }
+
+    .glitch-band {
+        background: linear-gradient(
+            to bottom,
+            transparent 0%,
+            transparent 42%,
+            rgba(182, 255, 200, 0.18) 48%,
+            rgba(255, 255, 255, 0.22) 50%,
+            rgba(182, 255, 200, 0.18) 52%,
+            transparent 58%,
+            transparent 100%
+        );
+        mix-blend-mode: screen;
+        transform: translateY(-100%);
+    }
+
+    .curvature.glitching .glitch-noise {
+        animation: glitch-noise 0.9s steps(9, end) both;
+    }
+    .curvature.glitching .glitch-band {
+        animation: glitch-band 0.9s linear both;
+    }
+    .curvature.glitching .content {
+        animation: glitch-shift 0.9s steps(9, end) both;
+    }
+
+    @keyframes glitch-noise {
+        0%,
+        100% {
+            opacity: 0;
+            background-position: 0 0;
+        }
+        15% {
+            opacity: 0.55;
+            background-position: -40px 18px;
+        }
+        30% {
+            opacity: 0.35;
+            background-position: 24px -12px;
+        }
+        45% {
+            opacity: 0.6;
+            background-position: -10px 30px;
+        }
+        65% {
+            opacity: 0.3;
+            background-position: 18px -22px;
+        }
+        85% {
+            opacity: 0.15;
+            background-position: -6px 8px;
+        }
+    }
+
+    @keyframes glitch-band {
+        0% {
+            transform: translateY(-30%);
+            opacity: 0;
+        }
+        15% {
+            opacity: 1;
+        }
+        85% {
+            opacity: 1;
+        }
+        100% {
+            transform: translateY(130%);
+            opacity: 0;
+        }
+    }
+
+    @keyframes glitch-shift {
+        0%,
+        100% {
+            transform: translateX(0);
+            filter: none;
+        }
+        15% {
+            transform: translateX(-4px);
+            filter: hue-rotate(20deg) brightness(1.1);
+        }
+        30% {
+            transform: translateX(3px);
+            filter: hue-rotate(-15deg);
+        }
+        45% {
+            transform: translateX(-2px);
+            filter: brightness(1.2) saturate(1.4);
+        }
+        65% {
+            transform: translateX(2px);
+        }
+        85% {
+            transform: translateX(-1px);
+        }
     }
 
     /* Horizontal scanlines */

@@ -52,34 +52,13 @@
         }
     }
 
-    // Occasional CRT glitch burst: static noise + a horizontal jitter and a
-    // sweeping hum bar. Fires ~2s after entering the menu, then every 3–7s.
-    let glitching = $state(false)
-    let glitchTimer = 0
-
-    function scheduleGlitch(delay: number) {
-        glitchTimer = window.setTimeout(() => {
-            glitching = true
-            window.setTimeout(() => {
-                glitching = false
-                scheduleGlitch(8000 + Math.random() * 7000)
-            }, 900)
-        }, delay)
-    }
-
     onMount(() => {
         window.addEventListener("keydown", handleKey)
-        scheduleGlitch(2000)
-        return () => {
-            window.removeEventListener("keydown", handleKey)
-            window.clearTimeout(glitchTimer)
-        }
+        return () => window.removeEventListener("keydown", handleKey)
     })
 </script>
 
-<div class="menu" class:glitching>
-    <div class="glitch-noise" aria-hidden="true"></div>
-    <div class="glitch-band" aria-hidden="true"></div>
+<div class="menu">
     <header>
         <h1 class="title glow-lg">PHOSPHOR</h1>
         <p class="subtitle dim">a frame-rate perception test</p>
@@ -130,121 +109,6 @@
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        position: relative;
-    }
-
-    .glitch-noise,
-    .glitch-band {
-        pointer-events: none;
-        position: absolute;
-        inset: 0;
-        z-index: 20;
-        opacity: 0;
-    }
-
-    /* High-frequency static noise via inline SVG turbulence. */
-    .glitch-noise {
-        background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='320' height='320'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='1.6' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.7  0 0 0 0 1  0 0 0 0 0.78  0 0 0 0.9 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
-        mix-blend-mode: screen;
-    }
-
-    /* Bright horizontal "hum bar" that sweeps top → bottom once. */
-    .glitch-band {
-        background: linear-gradient(
-            to bottom,
-            transparent 0%,
-            transparent 42%,
-            rgba(182, 255, 200, 0.18) 48%,
-            rgba(255, 255, 255, 0.22) 50%,
-            rgba(182, 255, 200, 0.18) 52%,
-            transparent 58%,
-            transparent 100%
-        );
-        mix-blend-mode: screen;
-        transform: translateY(-100%);
-    }
-
-    .menu.glitching .glitch-noise {
-        animation: glitch-noise 0.9s steps(9, end) both;
-    }
-    .menu.glitching .glitch-band {
-        animation: glitch-band 0.9s linear both;
-    }
-    .menu.glitching header,
-    .menu.glitching .items,
-    .menu.glitching footer {
-        animation: glitch-shift 0.9s steps(9, end) both;
-    }
-
-    @keyframes glitch-noise {
-        0%,
-        100% {
-            opacity: 0;
-            background-position: 0 0;
-        }
-        15% {
-            opacity: 0.55;
-            background-position: -40px 18px;
-        }
-        30% {
-            opacity: 0.35;
-            background-position: 24px -12px;
-        }
-        45% {
-            opacity: 0.6;
-            background-position: -10px 30px;
-        }
-        65% {
-            opacity: 0.3;
-            background-position: 18px -22px;
-        }
-        85% {
-            opacity: 0.15;
-            background-position: -6px 8px;
-        }
-    }
-
-    @keyframes glitch-band {
-        0% {
-            transform: translateY(-30%);
-            opacity: 0;
-        }
-        15% {
-            opacity: 1;
-        }
-        85% {
-            opacity: 1;
-        }
-        100% {
-            transform: translateY(130%);
-            opacity: 0;
-        }
-    }
-
-    @keyframes glitch-shift {
-        0%,
-        100% {
-            transform: translateX(0);
-            filter: none;
-        }
-        15% {
-            transform: translateX(-4px);
-            filter: hue-rotate(20deg) brightness(1.1);
-        }
-        30% {
-            transform: translateX(3px);
-            filter: hue-rotate(-15deg);
-        }
-        45% {
-            transform: translateX(-2px);
-            filter: brightness(1.2) saturate(1.4);
-        }
-        65% {
-            transform: translateX(2px);
-        }
-        85% {
-            transform: translateX(-1px);
-        }
     }
 
     header {

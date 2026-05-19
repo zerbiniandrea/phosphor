@@ -1,4 +1,5 @@
 import { execSync } from "node:child_process"
+
 import { svelte } from "@sveltejs/vite-plugin-svelte"
 import { defineConfig } from "vite"
 
@@ -12,7 +13,9 @@ const coiHeaders = {
 
 function gitShortSha(): string {
     try {
-        return execSync("git rev-parse --short HEAD", { stdio: ["ignore", "pipe", "ignore"] })
+        return execSync("git rev-parse --short HEAD", {
+            stdio: ["ignore", "pipe", "ignore"],
+        })
             .toString()
             .trim()
     } catch {

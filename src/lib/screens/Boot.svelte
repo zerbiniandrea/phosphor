@@ -3,7 +3,7 @@
 
     import { sfx } from "../audio/sfx"
     import Typewriter from "../components/Typewriter.svelte"
-    import { goto } from "../game/state.svelte"
+    import { game, goto } from "../game/state.svelte"
 
     const lines = [
         { text: "PHOSPHOR BIOS v0.1.0", delay: 600, speed: 14 },
@@ -55,7 +55,11 @@
             acc += Math.max(0, l.text.length * l.speed)
         })
         timers.push(window.setTimeout(() => sfx.bootComplete(), acc + 200))
-        timers.push(window.setTimeout(() => goto("menu"), acc + 1200))
+        // First-boot users land on calibrate so they don't start a run with a
+        // wrong refresh rate (esp. multi-monitor mixed-refresh setups, where
+        // requestAnimationFrame can lock to the wrong panel).
+        const next = game.monitorHz ? "menu" : "calibrate"
+        timers.push(window.setTimeout(() => goto(next), acc + 1200))
     }
 
     onMount(() => {

@@ -2,13 +2,14 @@
     import { onMount } from "svelte"
 
     import { sfx } from "../audio/sfx"
-    import { detectMaxFps } from "../fps/detect"
+    import { COMMON_RATES, detectMaxFps } from "../fps/detect"
     import { setMonitorHz, goto } from "../game/state.svelte"
 
     let phase = $state<"measuring" | "done">("measuring")
     let liveHz = $state(0)
     let finalHz = $state(0)
     let rawHz = $state(0)
+    let selectedHz = $state(0)
 
     onMount(() => {
         // Animate a live readout while detection runs.
@@ -29,21 +30,56 @@
             stopped = true
             rawHz = res.rawHz
             finalHz = res.snappedHz
-            setMonitorHz(res.snappedHz)
+            selectedHz = res.snappedHz
             phase = "done"
             sfx.success()
         })
     })
 
+    function selectRate(hz: number) {
+        if (hz === selectedHz) return
+        selectedHz = hz
+        sfx.tick()
+    }
+
+    function shiftSelection(delta: number) {
+        let i = COMMON_RATES.indexOf(selectedHz)
+        if (i < 0) {
+            // Detected value isn't in the chip row (e.g. an off-list raw rate
+            // that didn't snap). Jump to the nearest chip first.
+            let bestDist = Infinity
+            for (let j = 0; j < COMMON_RATES.length; j++) {
+                const d = Math.abs(COMMON_RATES[j] - selectedHz)
+                if (d < bestDist) {
+                    bestDist = d
+                    i = j
+                }
+            }
+        }
+        const n = COMMON_RATES.length
+        selectRate(COMMON_RATES[(i + delta + n) % n])
+    }
+
     function handleContinue() {
         sfx.tick()
+        setMonitorHz(selectedHz)
         goto("menu")
     }
 </script>
 
 <svelte:window
     onkeydown={e => {
-        if (phase === "done" && (e.key === "Enter" || e.key === " ")) handleContinue()
+        if (phase !== "done") return
+        if (e.key === "Enter" || e.key === " ") {
+            handleContinue()
+            e.preventDefault()
+        } else if (e.key === "ArrowLeft" || e.key === "h") {
+            shiftSelection(-1)
+            e.preventDefault()
+        } else if (e.key === "ArrowRight" || e.key === "l") {
+            shiftSelection(1)
+            e.preventDefault()
+        }
     }}
 />
 
@@ -60,13 +96,36 @@
             <div class="bar"><div class="fill"></div></div>
         {:else}
             <div class="label dim">DETECTED</div>
-            <div class="hz final">{finalHz}<span class="unit"> Hz</span></div>
-            <div class="raw dim">raw: {rawHz.toFixed(2)} Hz</div>
+            <div class="hz final">{selectedHz}<span class="unit"> Hz</span></div>
+            <div class="raw dim">
+                raw: {rawHz.toFixed(2)} Hz · snapped: {finalHz} Hz
+            </div>
+
+            <div class="override">
+                <div class="override-label dim">WRONG? PICK MANUALLY</div>
+                <div class="chips">
+                    {#each COMMON_RATES as hz}
+                        <button
+                            type="button"
+                            class="chip"
+                            class:active={hz === selectedHz}
+                            onclick={() => selectRate(hz)}
+                        >
+                            {hz}
+                        </button>
+                    {/each}
+                </div>
+                <p class="note dim">
+                    multi-monitor setups can fool auto-detect — pick the panel
+                    you're actually viewing on.
+                </p>
+            </div>
         {/if}
     </div>
 
     <footer class="hint dim">
         {#if phase === "done"}
+            <span class="bright">[←/→]</span> change ·
             <span class="bright">[ENTER]</span> continue
         {:else}
             please wait ...
@@ -124,6 +183,61 @@
     .raw {
         font-size: 1.2rem;
         letter-spacing: 0.2rem;
+    }
+
+    .override {
+        margin-top: 1.4rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.6rem;
+        max-width: 560px;
+    }
+    .override-label {
+        font-size: 1.1rem;
+        letter-spacing: 0.3rem;
+    }
+    .chips {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.35rem;
+    }
+    .chip {
+        background: transparent;
+        border: 1px solid var(--phosphor-faint);
+        color: var(--phosphor-dim);
+        font: inherit;
+        font-size: 1.1rem;
+        letter-spacing: 0.1rem;
+        padding: 0.2rem 0.6rem;
+        cursor: pointer;
+        text-shadow: var(--glow-sm);
+        font-variant-numeric: tabular-nums;
+        transition:
+            color 0.1s,
+            border-color 0.1s,
+            text-shadow 0.1s;
+    }
+    .chip:hover {
+        color: var(--phosphor);
+        border-color: var(--phosphor);
+    }
+    .chip.active {
+        color: var(--phosphor-bright);
+        border-color: var(--phosphor-bright);
+        text-shadow: var(--glow-lg);
+    }
+    .chip:focus-visible {
+        outline: none;
+        color: var(--phosphor-bright);
+    }
+    .note {
+        font-size: 1rem;
+        letter-spacing: 0.1rem;
+        margin: 0;
+        max-width: 44ch;
+        line-height: 1.4;
     }
 
     .bar {

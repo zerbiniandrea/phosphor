@@ -1,9 +1,13 @@
 // Common monitor refresh rates we'll snap detections to.
-const COMMON_RATES = [60, 75, 90, 100, 120, 144, 165, 180, 200, 240, 300, 360, 480]
+export const COMMON_RATES = [
+    60, 75, 90, 100, 120, 144, 165, 170, 175, 180, 200, 240, 244, 250, 280, 300,
+    360, 480, 500, 540,
+]
 
-// Snap to a common rate if within this percentage of it (handles jitter
-// causing e.g. 142.7 to read close-enough to 144).
-const SNAP_TOLERANCE = 0.05
+// Snap to a common rate if within this percentage of it (handles rAF
+// jitter, e.g. 143.2 → 144). Kept tight (1.5%) so unusual native rates
+// aren't pulled to the nearest listed common value.
+const SNAP_TOLERANCE = 0.015
 
 // Frames to discard at the very start — the first few rAF callbacks
 // after page mount tend to be irregular.
@@ -79,10 +83,8 @@ function snapToCommon(hz: number): number {
             bestDist = d
         }
     }
-    // If within tolerance, snap. Otherwise round to nearest 5 to be safe.
+    // If within tolerance, snap. Otherwise round to nearest integer so
+    // genuine non-standard refresh rates (244, 175, etc.) are preserved.
     if (bestDist / best <= SNAP_TOLERANCE) return best
-    if (hz > COMMON_RATES[COMMON_RATES.length - 1] + 30) {
-        return Math.round(hz / 10) * 10
-    }
-    return Math.round(hz / 5) * 5
+    return Math.round(hz)
 }

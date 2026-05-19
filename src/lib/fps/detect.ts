@@ -1,7 +1,7 @@
 // Common monitor refresh rates we'll snap detections to.
 export const COMMON_RATES = [
-    60, 75, 90, 100, 120, 144, 165, 170, 175, 180, 200, 240, 244, 250, 280, 300,
-    360, 480, 500, 540,
+    60, 75, 90, 100, 120, 144, 165, 170, 175, 180, 200, 240, 280, 300, 360, 480,
+    540,
 ]
 
 // Snap to a common rate if within this percentage of it (handles rAF
@@ -61,13 +61,20 @@ function finalize(deltas: number[]): DetectResult {
         return { rawHz: 60, snappedHz: 60, samples: 0, confident: false }
     }
     const sorted = [...deltas].toSorted((a, b) => a - b)
-    const median = sorted[Math.floor(sorted.length / 2)]
-    const rawHz = 1000 / median
+    // Trimmed mean (drop top/bottom 10%) rather than median. Median snaps
+    // to a single quantized value (e.g. dt readings of {3, 4, 3, 4, ...}
+    // give median 4ms → 250Hz even when the true rate is 280Hz). Mean
+    // averages through quantization buckets correctly; trimming protects
+    // against GC pauses and other spike outliers.
+    const trim = Math.floor(sorted.length * 0.1)
+    const core = sorted.slice(trim, sorted.length - trim)
+    const mean = core.reduce((a, b) => a + b, 0) / core.length
+    const rawHz = 1000 / mean
 
     const q1 = sorted[Math.floor(sorted.length * 0.25)]
     const q3 = sorted[Math.floor(sorted.length * 0.75)]
     const jitter = q3 - q1
-    const confident = jitter < median * 0.1
+    const confident = jitter < mean * 0.1
 
     const snappedHz = snapToCommon(rawHz)
     return { rawHz, snappedHz, samples: deltas.length, confident }

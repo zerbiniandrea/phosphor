@@ -121,10 +121,7 @@
             <div class="label dim">SAMPLING ...</div>
             <div class="hz live">{liveHz.toFixed(1)}<span class="unit"> Hz</span></div>
             <div class="bar">
-                <div
-                    class="fill"
-                    style="animation-duration: {SAMPLE_MS}ms"
-                ></div>
+                <div class="fill" style="animation-duration: {SAMPLE_MS}ms"></div>
             </div>
         {:else}
             <div class="label dim">DETECTED</div>
@@ -174,8 +171,8 @@
                     <span class="unit-sm dim">Hz</span>
                 </label>
                 <p class="note dim">
-                    multi-monitor setups can fool auto-detect — pick the panel
-                    you're actually viewing on.
+                    multi-monitor setups can fool auto-detect — pick the panel you're
+                    actually viewing on.
                 </p>
             </div>
         {/if}

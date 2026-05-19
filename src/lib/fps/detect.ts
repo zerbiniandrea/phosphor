@@ -1,7 +1,6 @@
 // Common monitor refresh rates we'll snap detections to.
 export const COMMON_RATES = [
-    60, 75, 90, 100, 120, 144, 165, 170, 175, 180, 200, 240, 280, 300, 360, 480,
-    540,
+    60, 75, 90, 100, 120, 144, 165, 170, 175, 180, 200, 240, 280, 300, 360, 480, 540,
 ]
 
 // Snap to a common rate if within this percentage of it (handles rAF

@@ -90,7 +90,7 @@ export function pickFpsForDifficulty(
         // clusters land at high, mid, and low FPS in proportion to the
         // FPS range each region covers.
         const center = fpsMin + Math.random() * range
-        const byDist = [...pool].sort(
+        const byDist = [...pool].toSorted(
             (a, b) => Math.abs(a - center) - Math.abs(b - center),
         )
         const picked = byDist.slice(0, count)

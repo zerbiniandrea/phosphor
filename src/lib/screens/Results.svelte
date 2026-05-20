@@ -4,28 +4,23 @@
     import { sfx } from "../audio/sfx"
     import { game, goto, recordResult, resetGame, totalScore } from "../game/state.svelte"
 
+    const TIERS = [
+        { min: 90, label: "PHOSPHOR INITIATE",   color: "var(--phosphor-bright)", bucket: "🟢" },
+        { min: 75, label: "FRAME SAVANT",        color: "var(--phosphor-bright)", bucket: "🟢" },
+        { min: 55, label: "DECENT EYE",          color: "var(--phosphor)",        bucket: "🟡" },
+        { min: 35, label: "STILL LEARNING",      color: "var(--phosphor-dim)",    bucket: "🟡" },
+        { min: 0,  label: "CONSULT OPTOMETRIST", color: "var(--amber)",           bucket: "🔴" },
+    ] as const
+
+    const tierFor = (s: number) => TIERS.find(t => s >= t.min)!
+
     let score = $derived(totalScore())
-    let verdict = $derived(scoreVerdict(score))
+    let verdict = $derived(tierFor(score))
     let copied = $state(false)
-
-    function scoreVerdict(s: number) {
-        if (s >= 90)
-            return { label: "PHOSPHOR INITIATE", color: "var(--phosphor-bright)" }
-        if (s >= 75) return { label: "FRAME SAVANT", color: "var(--phosphor-bright)" }
-        if (s >= 55) return { label: "DECENT EYE", color: "var(--phosphor)" }
-        if (s >= 35) return { label: "STILL LEARNING", color: "var(--phosphor-dim)" }
-        return { label: "CONSULT OPTOMETRIST", color: "var(--amber)" }
-    }
-
-    function bucket(s: number): string {
-        if (s >= 75) return "🟢"
-        if (s >= 35) return "🟡"
-        return "🔴"
-    }
 
     function buildShareText(): string {
         const diff = game.difficulty.toUpperCase()
-        const grid = game.rounds.map(r => bucket(r.scorePct)).join("")
+        const grid = game.rounds.map(r => tierFor(r.scorePct).bucket).join("")
         const header = "#   ACTUAL  GUESS  SCORE"
         const rows = game.rounds.map((r, i) => {
             const n = String(i + 1).padStart(2, "0")

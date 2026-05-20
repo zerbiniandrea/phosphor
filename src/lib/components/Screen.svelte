@@ -180,11 +180,13 @@
 
 <style>
     .bezel {
-        /* Fullscreen with bezel chrome — symmetric gaps around the screen,
-           thicker bottom strip for controls. Darker graphite for realism. */
-        width: 100vw;
-        height: 100vh;
-        padding: 2.8rem 2.8rem 5rem 2.8rem;
+        /* Constrained so the dark room shows around the monitor — reveals
+           the phosphor spill on the wall and the bezel as a physical object
+           sitting in space. Aspect-ratio gives it a CRT-ish 4:3 proportion. */
+        width: min(86vw, 116vh);
+        height: min(86vh, calc(86vw * 3 / 4));
+        aspect-ratio: 4 / 3;
+        padding: 2.4rem 2.4rem 4.4rem 2.4rem;
         /* Larger radius so the corners reveal more of the room — the
            noise + phosphor spill in the body shows through there. */
         border-radius: 42px;

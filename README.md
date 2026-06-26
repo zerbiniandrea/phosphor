@@ -100,6 +100,19 @@ A hum bar that occasionally sweeps the menu.
 
 None of it is necessary. All of it is the point.
 
+## ▌ SUPPORT
+
+```
+$ man phosphor | tail
+```
+
+phosphor will always run free in your browser. If it earned a
+spot on your machine, you can keep the tube warm:
+
+```
+https://ko-fi.com/zerbyy
+```
+
 ```
 $ exit
 ─── end of transmission ───

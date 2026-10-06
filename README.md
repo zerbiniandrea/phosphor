@@ -8,20 +8,13 @@
               ─── a frame-rate perception test ───
 ```
 
-<p align="center">
-  <img src="docs/oscilloscope.png" width="820" alt="phosphor oscilloscope round — a Lissajous trail glows on a green CRT, prompting 'AT WHAT FPS IS THIS RENDERING'" />
-</p>
+**Can you tell 60 FPS from 144 FPS?** phosphor is a free, browser-based
+FPS test. It calibrates to your monitor's refresh rate — 60Hz, 144Hz,
+240Hz — and finds out how well your eyes actually keep up.
 
-```
-$ man phosphor
+[![phosphor oscilloscope round — a Lissajous trail glows on a green CRT, prompting 'AT WHAT FPS IS THIS RENDERING'](docs/oscilloscope.png)](https://zerbiniandrea.github.io/phosphor/)
 
-NAME
-       phosphor(1) — a frame-rate perception test
-
-SYNOPSIS
-       a small green-phosphor CRT, a dim room, and one question:
-       how many frames per second was that?
-```
+<p align="center"><b>▶ <a href="https://zerbiniandrea.github.io/phosphor/">Play it in your browser</a></b></p>
 
 ## ▌ TRANSMISSION
 
@@ -30,6 +23,14 @@ The CRT scores the gap.
 
 There is no leaderboard. The CRT remembers your last fifty runs
 and that is enough.
+
+## ▌ WHY
+
+Is 144Hz worth it? Is 240Hz? Can the human eye even see past
+60 FPS? The internet has argued about it for twenty years.
+
+phosphor doesn't settle the argument. It settles it *for you* —
+on your eyes, on your monitor, in about two minutes.
 
 ## ▌ CONTROLS
 
